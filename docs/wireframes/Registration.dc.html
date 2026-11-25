@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Patient registration</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #c9c9c5;background:#f4f4f2;font-size:14px}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.panel{background:#f4f4f2;border:1px solid #c9c9c5;border-radius:6px}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.btn.ghost{min-height:36px;padding:0 10px;border-color:transparent;background:transparent}
+.btn[disabled]{color:#5c5c58;border-style:dashed;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#5c5c58}
+.field input,.field select{font:inherit;font-size:15px;color:#1f1f1f;min-height:40px;padding:0 10px;border:1px solid #8a8a85;border-radius:6px;background:#fff}
+.kbd{font-family:ui-monospace,monospace;font-size:12px;border:1px solid #8a8a85;border-radius:4px;padding:1px 5px;color:#1f1f1f;background:#fff}
+.muted{color:#5c5c58}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #8a8a85;white-space:nowrap}
+.warn{color:#9a4a07;border-color:#b45309}
+.ph{background:repeating-linear-gradient(45deg,#f4f4f2 0 8px,#ebebe7 8px 16px);border:1px dashed #8a8a85;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c5c58;font-size:13px;text-align:center}
+fieldset{border:1px solid #c9c9c5;border-radius:6px;padding:12px 16px 16px;margin:0;min-width:0}
+legend{font-weight:600;font-size:14px;padding:0 6px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:#1f1f1f}
+.seg label{display:flex;align-items:center;gap:6px;border:1px solid #8a8a85;border-radius:6px;padding:0 10px;min-height:40px}
+.shortcuts{display:flex;flex-wrap:wrap;gap:16px;padding:8px 20px;border-top:1px solid #c9c9c5;background:#f4f4f2;font-size:13px;color:#5c5c58}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-direction: column">
+  <header class="top">
+    <strong style="font-size: 16px">VSHMS</strong>
+    <span class="tag">Reception</span>
+    <nav style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="Main.dc.html" style="padding: 8px 10px">Home</a>
+      <a href="Registration.dc.html" style="padding: 8px 10px; font-weight: 600">Register</a>
+      <a href="Billing.dc.html" style="padding: 8px 10px">Billing</a>
+      <a href="BedBoard.dc.html" style="padding: 8px 10px">Beds</a>
+    </nav>
+    <span style="flex-grow: 1"></span>
+    <span class="muted">Solo · offline</span>
+    <span>Priya S.</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline">
+      <h1 style="margin: 0; font-size: 22px">New patient</h1>
+      <span class="muted" style="font-size: 14px">UHID KM1-004513 will be assigned on save</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <form style="flex: 999 1 720px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <fieldset>
+          <legend>Identity</legend>
+          <div class="grid">
+            <label class="field" style="grid-column: span 2">Full name *<input value="Kalyani Mondal"></label>
+            <div class="field" style="grid-column: span 2">Sex *
+              <div class="seg"><label><input type="radio" name="sex"> Male</label><label><input type="radio" name="sex" checked> Female</label><label><input type="radio" name="sex"> Other</label></div>
+            </div>
+            <div class="field" style="grid-column: span 2">Date of birth, or age if not known
+              <div class="seg">
+                <label><input type="radio" name="dob"> DOB</label>
+                <label><input type="radio" name="dob" checked> Age</label>
+                <input aria-label="Age" value="58" style="width: 72px; font: inherit; min-height: 40px; padding: 0 10px; border: 1px solid #8a8a85; border-radius: 6px">
+                <select aria-label="Age unit" style="font: inherit; min-height: 40px; border: 1px solid #8a8a85; border-radius: 6px; padding: 0 8px"><option>years</option><option>months</option><option>days</option></select>
+              </div>
+            </div>
+            <label class="field">Mobile *<input value="98301 xxxxx"></label>
+            <label class="field">Alternate mobile<input></label>
+            <label class="field">Relation<select><option>W/o</option><option>S/o</option><option>D/o</option><option>C/o</option></select></label>
+            <label class="field" style="grid-column: span 3">Relative / guardian name<input value="Sujit Mondal"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Address</legend>
+          <div class="grid">
+            <label class="field" style="grid-column: span 4">House, street, village / locality<input></label>
+            <label class="field">PIN code<input value="7432xx"></label>
+            <label class="field">District (from PIN)<input value="North 24 Parganas" readonly></label>
+            <label class="field">State (from PIN)<input value="West Bengal" readonly></label>
+            <label class="field">Post office<select><option>Choose…</option></select></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Category and IDs</legend>
+          <div class="grid">
+            <label class="field">Patient category<select><option>General</option><option>BPL</option><option>Staff</option><option>PM-JAY</option><option>TPA / insurance</option></select></label>
+            <label class="field">ABHA number / address<input placeholder="Optional"></label>
+            <div class="field">ABHA check<button type="button" class="btn" disabled>Verify (needs internet)</button></div>
+            <label class="field">Other ID (stored masked)<input placeholder="e.g. voter ID"></label>
+          </div>
+          <p class="muted" style="font-size: 12px; margin: 10px 0 0">Aadhaar numbers are never stored.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>Consent</legend>
+          <label style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px">
+            <input type="checkbox" checked style="margin-top: 3px">
+            <span>Patient has been told how their data is used and agrees (notice shown in English and the patient's language). <a href="#">Print consent notice</a></span>
+          </label>
+        </fieldset>
+      </form>
+
+      <aside style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 12px">
+        <div class="ph" style="height: 180px">Patient photo<br>(webcam) · optional</div>
+        <section class="box warn" style="padding: 12px; font-size: 14px; display: flex; flex-direction: column; gap: 8px">
+          <strong>Possible duplicate</strong>
+          <span style="color: #1f1f1f">Kalyani Mondal · F 57 · KM1-000391<br>Same mobile, registered 2025</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <button class="btn">Open existing</button>
+            <button class="btn ghost">Not the same</button>
+          </div>
+        </section>
+        <section class="panel" style="padding: 12px; font-size: 13px">
+          <strong style="font-size: 14px">Others on this mobile</strong>
+          <div style="margin-top: 6px">Sujit Mondal · M 61 · KM1-000390</div>
+        </section>
+      </aside>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px">
+      <button class="btn primary">Save and print card <span class="kbd" style="margin-left: 6px">Ctrl+S</span></button>
+      <a href="Main.dc.html" class="btn" style="display: inline-flex; align-items: center; text-decoration: none; color: #1f1f1f">Save and issue OPD token</a>
+      <a href="Main.dc.html" class="btn ghost" style="display: inline-flex; align-items: center; text-decoration: none; color: #1f1f1f">Cancel <span class="kbd" style="margin-left: 6px">Esc</span></a>
+    </div>
+  </main>
+
+  <footer class="shortcuts">
+    <span><span class="kbd">Tab</span> Next field</span>
+    <span><span class="kbd">Ctrl+S</span> Save</span>
+    <span><span class="kbd">Esc</span> Cancel</span>
+    <span>Draft saved automatically</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

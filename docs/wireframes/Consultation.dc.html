@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Doctor consultation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #c9c9c5;background:#f4f4f2;font-size:14px}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.panel{background:#f4f4f2;border:1px solid #c9c9c5;border-radius:6px}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.btn.ghost{min-height:36px;padding:0 10px;border-color:transparent;background:transparent}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#5c5c58}
+.field input,.field select,.field textarea{font:inherit;font-size:15px;color:#1f1f1f;min-height:40px;padding:8px 10px;border:1px solid #8a8a85;border-radius:6px;background:#fff}
+.kbd{font-family:ui-monospace,monospace;font-size:12px;border:1px solid #8a8a85;border-radius:4px;padding:1px 5px;color:#1f1f1f;background:#fff}
+.muted{color:#5c5c58}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #8a8a85;white-space:nowrap}
+.warn{color:#9a4a07;border-color:#b45309}
+.ph{background:repeating-linear-gradient(45deg,#f4f4f2 0 8px,#ebebe7 8px 16px);border:1px dashed #8a8a85;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c5c58;font-size:13px;text-align:center}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:600;color:#5c5c58;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:8px;border-bottom:1px solid #c9c9c5}
+td{padding:8px;border-bottom:1px solid #e4e4e0;vertical-align:top}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #c9c9c5}
+.tabs button{font:inherit;font-size:14px;min-height:40px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:none;color:#5c5c58;cursor:pointer}
+.tabs button.on{color:#1f1f1f;font-weight:600;border-bottom-color:#1f5fbf}
+.queue a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-bottom:1px solid #e4e4e0;text-decoration:none;color:#1f1f1f;font-size:14px}
+.shortcuts{display:flex;flex-wrap:wrap;gap:16px;padding:8px 20px;border-top:1px solid #c9c9c5;background:#f4f4f2;font-size:13px;color:#5c5c58}
+</style>
+</helmet>
+<div style="min-height: 880px; display: flex; flex-direction: column">
+  <header class="top">
+    <strong style="font-size: 16px">VSHMS</strong>
+    <span class="tag">Doctor</span>
+    <nav style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="Consultation.dc.html" style="padding: 8px 10px; font-weight: 600">My OPD</a>
+      <a href="BedBoard.dc.html" style="padding: 8px 10px">Ward rounds</a>
+    </nav>
+    <span style="flex-grow: 1"></span>
+    <span class="muted">Hub · online</span>
+    <span>Dr. A. Rao</span>
+  </header>
+
+  <div style="flex-grow: 1; display: flex; flex-wrap: wrap; align-items: stretch">
+    <nav class="queue" aria-label="Patient queue" style="flex: 1 1 220px; max-width: 260px; border-right: 1px solid #c9c9c5; background: #f4f4f2">
+      <div style="padding: 12px; font-weight: 600; font-size: 14px">Queue · 3 waiting</div>
+      <a href="#" style="background: #fff; border-left: 3px solid #1f5fbf"><strong>A-07 Meera Ghosh</strong><span class="muted">34 F · new visit</span></a>
+      <a href="#"><strong>A-08 Rafiq Ali</strong><span class="muted">61 M · follow-up</span></a>
+      <a href="#"><strong>A-09 Kalyani Mondal</strong><span class="muted">58 F · new</span></a>
+      <a href="#"><strong>A-10 Joy Saha</strong><span class="muted">22 M · follow-up</span></a>
+    </nav>
+
+    <main style="flex: 999 1 640px; min-width: 0; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px">
+      <section class="panel" style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center">
+        <div><strong style="font-size: 18px">Meera Ghosh</strong> <span class="muted">· 34 F · KM1-003876 · General</span></div>
+        <span class="tag warn">Allergy: penicillin</span>
+        <span style="flex-grow: 1"></span>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px">
+          <span><span class="muted">BP</span> 128/84</span>
+          <span><span class="muted">Pulse</span> 92</span>
+          <span><span class="muted">Temp</span> 100.4 °F</span>
+          <span><span class="muted">SpO₂</span> 98%</span>
+          <span><span class="muted">Wt</span> 61 kg</span>
+        </div>
+      </section>
+
+      <div class="tabs" role="tablist">
+        <button class="on" role="tab">Notes and Rx</button>
+        <button role="tab">Orders</button>
+        <button role="tab">History (4 visits)</button>
+        <button role="tab">Documents</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <label class="field">Complaints<textarea rows="2">Fever 3 days, sore throat, body ache</textarea></label>
+        <label class="field">Examination<textarea rows="2">Throat congested, no rash</textarea></label>
+        <label class="field" style="grid-column: span 2">Diagnosis (ICD-10 search)
+          <input value="J06.9 · Acute upper respiratory infection, unspecified">
+        </label>
+      </div>
+
+      <section class="box" style="padding: 12px">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px">
+          <h2 style="margin: 0; font-size: 16px">Prescription</h2>
+          <span style="flex-grow: 1"></span>
+          <button class="btn ghost">Favourites</button>
+          <button class="btn ghost">Repeat last Rx</button>
+          <button class="btn ghost">Templates</button>
+        </div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead><tr><th>Medicine (generic first)</th><th>Dose</th><th>Days</th><th>When</th><th>Patient sees</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Paracetamol 650 mg</strong> tab</td><td>1-1-1</td><td>3</td><td>After food</td><td class="muted">1 tablet morning, afternoon, night · 3 days, after food<br>सुबह, दोपहर, रात 1 गोली · 3 दिन, खाने के बाद</td></tr>
+              <tr><td><strong>Cetirizine 10 mg</strong> tab</td><td>0-0-1</td><td>5</td><td>After food</td><td class="muted">1 tablet at night · 5 days</td></tr>
+              <tr><td><input aria-label="Add medicine" placeholder="Type to add a medicine…" style="font: inherit; width: 100%; min-height: 36px; border: 1px dashed #8a8a85; border-radius: 6px; padding: 0 8px"></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="font-size: 12px; margin: 8px 0 0">Shorthand expands as you type: 1-0-1 · BD · TDS · SOS · AF / BF</p>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+        <label class="field">Lab orders<input value="CBC, CRP"></label>
+        <label class="field">Follow-up<input value="28-11-2026"></label>
+        <label class="field" style="flex: 1 1 240px">Advice<input value="Warm saline gargles, plenty of fluids"></label>
+      </div>
+    </main>
+
+    <aside style="flex: 1 1 260px; max-width: 320px; padding: 16px; border-left: 1px solid #c9c9c5; display: flex; flex-direction: column; gap: 12px">
+      <strong style="font-size: 14px">Print preview · A5 letterhead</strong>
+      <div class="ph" style="height: 340px">A5 prescription<br>hospital letterhead space<br>Dr. A. Rao · Reg. no. [WBMC xxxxx]<br>bilingual instructions</div>
+      <button class="btn primary">Save and print Rx <span class="kbd" style="margin-left: 6px">Ctrl+P</span></button>
+      <button class="btn">Send to pharmacy and lab</button>
+      <button class="btn ghost">Next patient <span class="kbd" style="margin-left: 6px">Ctrl+→</span></button>
+    </aside>
+  </div>
+
+  <footer class="shortcuts">
+    <span><span class="kbd">Alt+D</span> Diagnosis</span>
+    <span><span class="kbd">Alt+M</span> Add medicine</span>
+    <span><span class="kbd">Ctrl+P</span> Print Rx</span>
+    <span>Draft saved 4 s ago</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":880}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
