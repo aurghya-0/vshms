@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 
 from vshms import __version__
 from vshms.config import Settings, get_settings
+from vshms.db import make_engine, make_session_factory
 
 PACKAGE_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=PACKAGE_DIR / "templates")
@@ -27,6 +28,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     app.state.settings = settings
+    app.state.engine = make_engine(settings)
+    app.state.session_factory = make_session_factory(app.state.engine)
     app.mount("/static", StaticFiles(directory=PACKAGE_DIR / "static"), name="static")
 
     @app.get("/health")

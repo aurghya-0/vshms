@@ -186,8 +186,9 @@ The data rules in PLAN.md §5.4 must hold from the very first table, even though
 ## Definition of done (every task)
 
 - [ ] Code follows [CONTRIBUTING.md](../CONTRIBUTING.md) (module layout, append-only records, no CDN, `_()` for text, `Decimal` for money).
-- [ ] Tests cover the main path and the edge cases named in the task.
-- [ ] `ruff`, `mypy` and `pytest` pass in CI on Ubuntu and Windows.
+- [ ] Unit tests cover the logic and edge cases named in the task; integration tests cover each new route or screen (see the testing rules in [CLAUDE.md](../CLAUDE.md)).
+- [ ] UI and print changes were also checked by hand (keyboard-only, 1366×768, tablet, offline, real paper sizes).
+- [ ] `ruff`, `mypy` and `pytest --cov` (80% minimum) pass in CI on Ubuntu and Windows.
 - [ ] Schema changes come with an Alembic migration.
 - [ ] Decisions and spike results are recorded in `docs/adr/`.
 - [ ] The intern has shown it working at the Friday demo.

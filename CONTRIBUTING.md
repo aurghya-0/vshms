@@ -4,7 +4,8 @@
 
 1. Install Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 2. Clone the repository and run `uv sync`.
-3. Run the checks: `uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest`.
+3. Run the checks: `uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov`.
+4. Read [CLAUDE.md](CLAUDE.md): the standing rules, including **how to write unit and integration tests**, apply to every change.
 
 ## Workflow
 
