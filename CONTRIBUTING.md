@@ -13,7 +13,7 @@
 - Open a **draft pull request early**, by day 2 of a task, so reviewers can catch problems before they grow.
 - Every pull request needs **one review from the mentor**, plus one from another intern when the change touches that intern's area (see the ownership table in [docs/TASKS.md](docs/TASKS.md)).
 - Keep pull requests small: under about 400 changed lines where possible. Split large tasks into several pull requests.
-- CI must be green before merging. Never skip or delete a failing test to get green; ask for help instead.
+- CI must be green before merging. Pull requests to `main` also run the **Main gate**: security scans (CodeQL, Bandit, vulnerable dependencies, leaked secrets) and a migration check. Never skip or delete a failing test or silence a security finding to get green; ask for help instead.
 - Squash-merge. The pull request title becomes the commit message, so start it with the task ID: `A2: Add hybrid logical clock`.
 
 ## Module layout

@@ -84,6 +84,7 @@ Automated tests aren't enough for screens and printing. For any UI or print chan
 ## Workflow rules
 
 - Work on a feature branch; **never commit or push directly to `main`** unless explicitly asked.
+- **Every change to `main` must pass the Main gate** (`.github/workflows/main-gate.yml`): tests on Ubuntu and Windows, migrations matching models, CodeQL, Bandit, dependency audit, dependency review and secret scanning. Fix the finding; never disable a check, lower a threshold, or add a `# noqa: S...` / `# nosec` without a comment explaining why it is safe and the mentor's agreement.
 - Keep pull requests small (under about 400 changed lines) and title them with the task ID: `A2: Add hybrid logical clock`.
 - **Ask before adding a new dependency.** Prefer pure-Python packages or ones with Windows wheels; record the choice in an ADR if it's significant.
 - Record design decisions and spike results in `docs/adr/` (numbered, short).
