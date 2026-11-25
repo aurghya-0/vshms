@@ -57,7 +57,7 @@ In a small hospital one person often holds several of these roles, so a user can
 | M17 | **OT** | OT scheduling, WHO surgical safety checklist, anaesthesia record, implant/consumable capture, OT notes | 5 |
 | M18 | **Special registers** | PC-PNDT Form F (if the hospital has USG), MTP registers (kept confidential), biomedical waste daily log and Form IV annual report | 5 |
 | M19 | **Quality (NABH)** | Quality indicator capture (most counted automatically from transactions), incident reporting, patient feedback, monthly indicator report | 5 |
-| M20 | **Integrations** | NHCX claims, lab analyzer interfacing (ASTM/HL7), SMS (TRAI DLT templates)/WhatsApp notifications, Android tablet app | 5+ |
+| M20 | **Integrations** | NHCX claims, lab analyzer interfacing (ASTM/HL7), SMS (TRAI DLT templates)/WhatsApp notifications, tablet-optimised layouts | 5+ |
 
 ---
 
@@ -115,14 +115,15 @@ Tier 1: SOLO                 Tier 2: CLINIC LAN                       Tier 3: CO
 
 ```
 ┌───────────────────────── VSHMS node ─────────────────────────┐
-│  UI (React + TypeScript, in a desktop window or a browser)   │
-│        │  HTTP/JSON (localhost, or LAN for thin clients)     │
-│  Local server (Node.js, TypeScript)                          │
-│   ├─ Domain services (registration, billing, pharmacy, ...)  │
+│  UI: server-rendered HTML (Django templates + HTMX/Alpine),  │
+│      shown in a pywebview desktop window or any browser      │
+│        │  HTTP (localhost, or LAN for thin clients)          │
+│  Local server: Django on waitress (pure-Python WSGI)         │
+│   ├─ Domain apps (patients, opd, billing, pharmacy, ...)     │
 │   ├─ Rules (GST, tariffs, packages, retention, permissions)  │
 │   ├─ Sync engine (outbox/inbox, HLC, merge rules)            │
-│   ├─ Print engine (HTML templates → A4/A5/80 mm thermal)     │
-│   ├─ Job queue (ABDM, SMS, backups; retried when online)     │
+│   ├─ Print engine (HTML templates → A4/A5, ESC/POS thermal)  │
+│   ├─ Job queue: Huey on SQLite (ABDM, SMS, backups; retried) │
 │   └─ Audit log (append-only, hash-chained)                   │
 │  SQLite (WAL mode) encrypted with SQLCipher + file store     │
 └──────────────────────────────────────────────────────────────┘
@@ -132,14 +133,19 @@ Tier 1: SOLO                 Tier 2: CLINIC LAN                       Tier 3: CO
 
 | Concern | Choice | Why |
 |---|---|---|
-| Language | **TypeScript** for UI, server and sync | One language, large hiring pool in India, shared types between client and server |
-| UI | React + Vite, a component library with strong keyboard support, i18next for languages | Common stack. The same UI runs in the desktop window and in thin-client browsers |
-| Desktop shell | **Electron**, with the local server embedded in the main process | Simplest way to run Node + SQLite and serve LAN browsers from one install. Re-evaluate **Tauri 2** if installer size or RAM becomes a problem. Minimum OS: Windows 10/11 64-bit, Ubuntu 22.04+ |
-| Local DB | **SQLite** (better-sqlite3 + **SQLCipher**), WAL mode, `synchronous=FULL` for financial tables | Zero administration, survives power cuts, a single file that is easy to back up |
-| Cloud relay | The same server code in headless mode on **PostgreSQL**, hosted in an Indian region | Reuses the code. Keeping data in India suits ABDM and hospital expectations |
-| Sync | **Custom change-log replication** (§5.4) | Medical data needs domain-specific merge rules (stock ledgers, invoice series, beds). Off-the-shelf CRDT or sync services fit these poorly. A small, auditable protocol is safer. (PowerSync and ElectricSQL were considered as alternatives.) |
-| Interoperability | FHIR R4 mapping layer (NRCeS profiles) | Needed for ABDM and NHCX. Only a mapping layer, so the internal schema stays simple |
-| Printing | HTML/CSS templates rendered to PDF or sent straight to the printer; ESC/POS for thermal printers | Hospitals use pre-printed letterheads, A5 prescriptions and 80 mm receipts, and templates must be editable |
+| Language | **Python 3.12+**, with type hints checked by mypy | The team's choice. Mature libraries for every need below |
+| Web framework | **Django 5.x** | Comes with an ORM, migrations, authentication and permissions, forms, i18n (gettext) and an admin site, which covers most of an HMS's plumbing. The admin site handles master-data screens in early phases |
+| UI | **Server-rendered Django templates + HTMX + Alpine.js**, with a small JS hotkeys layer | The UI stays almost entirely in Python, with no separate front-end build. Pages are light enough for 4 GB PCs and thin-client tablets, and work the same in the desktop window and LAN browsers |
+| App server | **waitress** (pure-Python WSGI) | Works the same on Windows and Linux with no compiled dependencies. It serves localhost and, on the hub, the LAN |
+| Desktop shell | **pywebview** window pointing at the local server, packaged with **PyInstaller** and an **Inno Setup** installer | A native window that uses the system's WebView2, not a bundled browser, so the installer stays small. Minimum OS: Windows 10/11 64-bit, Ubuntu 22.04+ |
+| Local DB | **SQLite** in WAL mode, `synchronous=FULL` for financial tables, encrypted with **SQLCipher** (`sqlcipher3` wheels with a thin custom Django DB backend) | Zero administration, survives power cuts, a single file that is easy to back up. The SQLCipher backend is a Phase 0 spike (§11) |
+| Background jobs | **Huey** with SQLite storage | No Redis needed. Queues ABDM calls, SMS, backups and sync retries |
+| Cloud relay | The same Django project on **PostgreSQL**, hosted in an Indian region | Reuses the code. Keeping data in India suits ABDM and hospital expectations |
+| Sync | **Custom change-log replication** in Python (§5.4) | Medical data needs domain-specific merge rules (stock ledgers, invoice series, beds). Off-the-shelf CRDT or sync services fit these poorly. A small, auditable protocol is safer |
+| Interoperability | `fhir.resources` (Pydantic FHIR R4 models) with NRCeS profile mappings | Needed for ABDM and NHCX. Only a mapping layer, so the internal schema stays simple |
+| Printing | HTML/CSS print templates printed through the webview's print dialog. **python-escpos** prints receipts silently on thermal printers. Server-side PDF (WeasyPrint or ReportLab) for saved and shared documents | Hospitals use pre-printed letterheads, A5 prescriptions and 80 mm receipts, and templates must be editable |
+| Other libraries | `openpyxl` (Excel import/export), `lxml` (Tally XML), `qrcode` (UPI and pairing QR codes), `uuid6` (UUIDv7; in the standard library from Python 3.14) | Well-maintained and pure Python or wheel-available on Windows |
+| Testing | **pytest**, **Hypothesis** for property-based sync tests, Playwright for UI flows | Hypothesis suits the randomized multi-device sync simulation |
 | Updates | Signed update packages that install online **or from a USB drive** | Many sites have poor internet |
 
 ### 5.4 Data model and sync design
@@ -163,7 +169,7 @@ The design rules below are fixed from day 1, even though multi-device sync ships
 | **D. Exclusive resources** | Bed occupancy, OT slots | The hub takes a soft lock when it is reachable. If two devices allot the same bed while offline, both are kept and a conflict is raised for a person to resolve. The bed board shows these conflicts clearly |
 
 **Protocol**
-1. Every write passes through the repository layer, which writes the row **and** an `outbox` entry in one SQLite transaction.
+1. Every syncable model inherits from a common `SyncModel` base (ID, HLC, tombstone and device fields). Its save and delete paths write the row **and** an `outbox` entry in one `transaction.atomic()` block. Bulk ORM operations that bypass `save()` (`update()`, `bulk_create()`) are banned on syncable models by a lint check.
 2. A node **pushes** its outbox to the hub over HTTPS (TLS certificate pinned at pairing). The hub gives each change a monotonic `server_seq`.
 3. A node **pulls** changes after its last `server_seq`, applies the merge rules and records the new cursor. Changes are applied idempotently, keyed by change ID.
 4. The hub syncs to the cloud relay with the same protocol (the hub is a client of the relay).
@@ -242,12 +248,12 @@ Rough sizes assume a team of 3–4 developers plus 1 domain or QA person.
 
 | Phase | Scope | Exit criteria | Size |
 |---|---|---|---|
-| **0. Foundations** | Repository, build and installer; schema conventions (IDs, HLC, outbox, tombstones); repository layer; audit log; auth/roles/PIN; i18n; print engine; backup/restore | Empty app installs on Windows 10 and Ubuntu; backup and restore round-trip passes; power-cut test passes | ~6 wks |
+| **0. Foundations** | Django project and `SyncModel` base (IDs, HLC, outbox, tombstones); audit log; auth/roles/PIN; i18n; print engine; backup/restore; PyInstaller + pywebview + Inno Setup installer. **Spikes first:** SQLCipher Django backend, packaged-app start time and RAM on a 4 GB PC, printing through WebView2 | Empty app installs on Windows 10 and Ubuntu; backup and restore round-trip passes; power-cut test passes; cold start under 5 s | ~6 wks |
 | **1. Solo MVP (OPD + Pharmacy + Billing)** | M1–M7 | A pilot clinic runs **one full week of OPD** on one PC with no paper fallback | ~12 wks |
 | **2. IPD and compliance** | M8–M13 | A pilot hospital with 10–30 beds runs admissions to discharge, including an insurance case; statutory registers are reviewed by a compliance consultant | ~14 wks |
 | **3. LAN multi-device** | M14, thin clients, conflict review | Three or more devices for two weeks; a randomized sync test suite passes; no data loss after cutting Wi-Fi for a day | ~8 wks |
 | **4. Connected** | M15, M16 (ABDM M1→M2→M3 sandbox, then certification), remote dashboard | ABDM sandbox certification; off-site restore drill | ~10 wks |
-| **5. Depth** | M17–M20, Android tablet app | Driven by pilot feedback | ongoing |
+| **5. Depth** | M17–M20 | Driven by pilot feedback | ongoing |
 
 Multi-device sync ships in Phase 3, but the **data layer is sync-ready from Phase 0**. Adding it later is a configuration change, not a migration.
 
@@ -275,6 +281,9 @@ Multi-device sync ships in Phase 3, but the **data layer is sync-ready from Phas
 | Hardware failure on a single PC | Automatic snapshots, enforced USB backups, one-click restore to a new PC |
 | ABDM needs a public endpoint | The cloud relay provides it; solo sites can still do M1 (ABHA verification) when online |
 | Drug master licensing | Ship a generic list; hospitals import their own brand list or supplier price lists |
+| Packaging Python for Windows (antivirus false positives on PyInstaller builds, slow start) | Code-sign the installer, use one-folder (not one-file) builds, measure start time in the Phase 0 spike. Fall back to Nuitka if needed |
+| SQLCipher with Django is not officially supported | Spike in Phase 0. Fallbacks: OS disk encryption (BitLocker) plus encrypted backups, or field-level encryption for the most sensitive tables |
+| Python on Android | Tablets stay browser thin clients. A full offline Android node would be a separate app and is not planned |
 
 ---
 
@@ -282,21 +291,28 @@ Multi-device sync ships in Phase 3, but the **data layer is sync-ready from Phas
 
 ```
 vshms/
-├── apps/
-│   ├── desktop/        # Electron shell (window + embedded local server)
-│   ├── server/         # Local/hub/relay server (Node, TypeScript)
-│   └── web/            # React UI (served to the desktop window and LAN browsers)
-├── packages/
-│   ├── domain/         # Entities, services, business rules (pure TypeScript)
-│   ├── db/             # Schema, migrations, repository layer, outbox
-│   ├── sync/           # HLC, push/pull protocol, merge rules, pairing
-│   ├── rules/          # GST, tariffs, packages, retention, permissions
-│   ├── fhir/           # FHIR R4 / NRCeS mappings (ABDM, NHCX)
-│   ├── print/          # Print templates and renderers (A4/A5/thermal)
-│   ├── i18n/           # Language packs
-│   └── masters/        # Seed data: ICD-10, lab tests, generic drugs, PIN codes
-├── docs/               # ADRs, compliance notes, user guides
-└── tests/sync-sim/     # Multi-device sync simulation suite
+├── pyproject.toml          # Dependencies (managed with uv), ruff, mypy, pytest config
+├── src/vshms/
+│   ├── settings/           # Base, desktop, hub and relay settings
+│   ├── core/               # SyncModel base, HLC, UUIDv7, audit log, permissions, PIN login
+│   ├── sync/               # Outbox/inbox, push/pull API, merge rules, device pairing
+│   ├── patients/           # Registration, UHID, consent
+│   ├── opd/                # Tokens, appointments, consultations
+│   ├── prescriptions/
+│   ├── billing/            # Tariffs, invoices, payments, GST rules, day-end closing
+│   ├── pharmacy/           # Items, batches, stock ledger, H1/X/NDPS registers
+│   ├── ipd/  nursing/  lab/  insurance/  registers/   # Phase 2
+│   ├── fhir/               # FHIR R4 / NRCeS mappings (ABDM, NHCX)
+│   ├── printing/           # Print templates (A4/A5), ESC/POS receipts, PDF
+│   ├── masters/            # Seed data: ICD-10, lab tests, generic drugs, PIN codes
+│   ├── templates/  static/ # Django templates, HTMX/Alpine, CSS
+│   └── locale/             # gettext translation files
+├── desktop/                # pywebview launcher (starts waitress, opens window)
+├── packaging/              # PyInstaller spec, Inno Setup script, update signing
+├── docs/                   # ADRs, compliance notes, user guides
+└── tests/
+    ├── unit/
+    └── sync_sim/           # Hypothesis-based multi-device sync simulation
 ```
 
 ---
@@ -305,6 +321,6 @@ vshms/
 
 1. **Business model:** open source, freemium (Solo free, sync/cloud paid) or fully commercial? This affects licensing choices.
 2. **Pilot sites:** which hospitals, and which states (state Clinical Establishments rules and languages)?
-3. **Desktop shell:** Electron (simpler) or Tauri (lighter)? The recommendation is to start with Electron.
+3. **UI approach:** server-rendered Django + HTMX (recommended: almost all Python, light on old PCs), or a separate JavaScript front end (React) talking to a Django REST API (richer offline browser behaviour, but a second language and build)?
 4. **ABDM timing:** keep it in Phase 4, or move ABHA/Scan & Share into Phase 1 for the DHIS incentive?
-5. **Android:** are tablets thin clients only (Phase 3), or full offline nodes (Phase 5)?
+5. **Hosting the relay:** which Indian cloud region and provider for Tier 3 (relevant from Phase 4)?
