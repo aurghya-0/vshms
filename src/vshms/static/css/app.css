@@ -1,0 +1,30 @@
+/* Base styles. Task B1 turns this into the app's design tokens and layout. */
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --accent: #0b6e4f;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+}
+
+.brand {
+  font-weight: 700;
+}
+
+.content {
+  padding: 1rem;
+}
