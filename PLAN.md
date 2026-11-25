@@ -115,11 +115,12 @@ Tier 1: SOLO                 Tier 2: CLINIC LAN                       Tier 3: CO
 
 ```
 ┌───────────────────────── VSHMS node ─────────────────────────┐
-│  UI: server-rendered HTML (Django templates + HTMX/Alpine),  │
-│      shown in a pywebview desktop window or any browser      │
+│  UI: server-rendered HTML (Jinja2 templates + HTMX/Alpine),  │
+│      plus SQLAdmin master-data screens, shown in a pywebview │
+│      desktop window or any browser                           │
 │        │  HTTP (localhost, or LAN for thin clients)          │
-│  Local server: Django on waitress (pure-Python WSGI)         │
-│   ├─ Domain apps (patients, opd, billing, pharmacy, ...)     │
+│  Local server: FastAPI on Uvicorn                            │
+│   ├─ Domain modules (patients, opd, billing, pharmacy, ...)  │
 │   ├─ Rules (GST, tariffs, packages, retention, permissions)  │
 │   ├─ Sync engine (outbox/inbox, HLC, merge rules)            │
 │   ├─ Print engine (HTML templates → A4/A5, ESC/POS thermal)  │
@@ -134,13 +135,18 @@ Tier 1: SOLO                 Tier 2: CLINIC LAN                       Tier 3: CO
 | Concern | Choice | Why |
 |---|---|---|
 | Language | **Python 3.12+**, with type hints checked by mypy | The team's choice. Mature libraries for every need below |
-| Web framework | **Django 5.x** | Comes with an ORM, migrations, authentication and permissions, forms, i18n (gettext) and an admin site, which covers most of an HMS's plumbing. The admin site handles master-data screens in early phases |
-| UI | **Server-rendered Django templates + HTMX + Alpine.js**, with a small JS hotkeys layer | The UI stays almost entirely in Python, with no separate front-end build. Pages are light enough for 4 GB PCs and thin-client tablets, and work the same in the desktop window and LAN browsers |
-| App server | **waitress** (pure-Python WSGI) | Works the same on Windows and Linux with no compiled dependencies. It serves localhost and, on the hub, the LAN |
+| Web framework | **FastAPI** | Pydantic types end to end and auto-generated OpenAPI docs, which suit the sync protocol, ABDM/FHIR and any later mobile or React client. Each module has HTML routes for the UI and JSON routes for sync and integrations |
+| ORM and migrations | **SQLAlchemy 2.0** (typed ORM) + **Alembic** | One code path for SQLite on devices and PostgreSQL on the relay. Session events give a reliable hook for the sync outbox (§5.4) |
+| Master-data screens | **SQLAdmin** | Ready-made list/create/edit screens for drugs, lab tests, rate lists, wards and beds, doctors and users, protected by the app's own login and role checks. Day-to-day workflows (registration, billing, dispensing) get purpose-built screens instead |
+| UI | **Jinja2 templates + HTMX + Alpine.js**, with a small JS hotkeys layer | The UI stays almost entirely in Python, with no separate front-end build. Pages are light enough for 4 GB PCs and thin-client tablets, and work the same in the desktop window and LAN browsers |
+| Forms and validation | **Pydantic** models validate form posts. Shared Jinja2 macros render fields and errors | One validation layer for HTML forms and JSON APIs |
+| Auth and security | Session cookies (Starlette `SessionMiddleware`), **argon2-cffi** password and PIN hashing, a role/permission table checked by a FastAPI dependency (`require("billing.refund")`), CSRF tokens sent by HTMX in a header | FastAPI has no built-in login system, so this is built in Phase 0 and gets a security review before the pilot |
+| i18n | **Babel** with the Jinja2 i18n extension (gettext `.po` files) | Standard translation workflow for Hindi and regional languages |
+| App server | **Uvicorn** (without uvloop on Windows) | The standard FastAPI server, works on Windows and Linux. It serves localhost and, on the hub, the LAN |
 | Desktop shell | **pywebview** window pointing at the local server, packaged with **PyInstaller** and an **Inno Setup** installer | A native window that uses the system's WebView2, not a bundled browser, so the installer stays small. Minimum OS: Windows 10/11 64-bit, Ubuntu 22.04+ |
-| Local DB | **SQLite** in WAL mode, `synchronous=FULL` for financial tables, encrypted with **SQLCipher** (`sqlcipher3` wheels with a thin custom Django DB backend) | Zero administration, survives power cuts, a single file that is easy to back up. The SQLCipher backend is a Phase 0 spike (§11) |
+| Local DB | **SQLite** in WAL mode, `synchronous=FULL` for financial tables, encrypted with **SQLCipher** through SQLAlchemy's built-in `sqlite+pysqlcipher` dialect and the `sqlcipher3` driver | Zero administration, survives power cuts, a single file that is easy to back up. SQLAlchemy supports SQLCipher directly; Phase 0 only has to confirm the driver packages cleanly on Windows (§11) |
 | Background jobs | **Huey** with SQLite storage | No Redis needed. Queues ABDM calls, SMS, backups and sync retries |
-| Cloud relay | The same Django project on **PostgreSQL**, hosted in an Indian region | Reuses the code. Keeping data in India suits ABDM and hospital expectations |
+| Cloud relay | The same FastAPI app on **PostgreSQL**, hosted in an Indian region | Reuses the code. Keeping data in India suits ABDM and hospital expectations |
 | Sync | **Custom change-log replication** in Python (§5.4) | Medical data needs domain-specific merge rules (stock ledgers, invoice series, beds). Off-the-shelf CRDT or sync services fit these poorly. A small, auditable protocol is safer |
 | Interoperability | `fhir.resources` (Pydantic FHIR R4 models) with NRCeS profile mappings | Needed for ABDM and NHCX. Only a mapping layer, so the internal schema stays simple |
 | Printing | HTML/CSS print templates printed through the webview's print dialog. **python-escpos** prints receipts silently on thermal printers. Server-side PDF (WeasyPrint or ReportLab) for saved and shared documents | Hospitals use pre-printed letterheads, A5 prescriptions and 80 mm receipts, and templates must be editable |
@@ -169,7 +175,7 @@ The design rules below are fixed from day 1, even though multi-device sync ships
 | **D. Exclusive resources** | Bed occupancy, OT slots | The hub takes a soft lock when it is reachable. If two devices allot the same bed while offline, both are kept and a conflict is raised for a person to resolve. The bed board shows these conflicts clearly |
 
 **Protocol**
-1. Every syncable model inherits from a common `SyncModel` base (ID, HLC, tombstone and device fields). Its save and delete paths write the row **and** an `outbox` entry in one `transaction.atomic()` block. Bulk ORM operations that bypass `save()` (`update()`, `bulk_create()`) are banned on syncable models by a lint check.
+1. Every syncable model inherits from a common `SyncBase` mixin (ID, HLC, tombstone and device fields). A SQLAlchemy `before_flush` session event stamps the HLC and writes an `outbox` entry for each new, changed or deleted row, so the row and its outbox entry commit in the same transaction. Bulk `update()`/`delete()` statements skip the ORM's flush, so a `do_orm_execute` event **rejects** them on syncable tables.
 2. A node **pushes** its outbox to the hub over HTTPS (TLS certificate pinned at pairing). The hub gives each change a monotonic `server_seq`.
 3. A node **pulls** changes after its last `server_seq`, applies the merge rules and records the new cursor. Changes are applied idempotently, keyed by change ID.
 4. The hub syncs to the cloud relay with the same protocol (the hub is a client of the relay).
@@ -248,7 +254,7 @@ Rough sizes assume a team of 3–4 developers plus 1 domain or QA person.
 
 | Phase | Scope | Exit criteria | Size |
 |---|---|---|---|
-| **0. Foundations** | Django project and `SyncModel` base (IDs, HLC, outbox, tombstones); audit log; auth/roles/PIN; i18n; print engine; backup/restore; PyInstaller + pywebview + Inno Setup installer. **Spikes first:** SQLCipher Django backend, packaged-app start time and RAM on a 4 GB PC, printing through WebView2 | Empty app installs on Windows 10 and Ubuntu; backup and restore round-trip passes; power-cut test passes; cold start under 5 s | ~6 wks |
+| **0. Foundations** | FastAPI app skeleton, SQLAlchemy models with the `SyncBase` mixin (IDs, HLC, outbox, tombstones), Alembic migrations; audit log; login, sessions, CSRF, roles/permissions and PIN switching; SQLAdmin wired to that login; Babel i18n; print engine; backup/restore; PyInstaller + pywebview + Inno Setup installer. **Spikes first:** `sqlcipher3` packaged on Windows, packaged-app start time and RAM on a 4 GB PC, printing through WebView2 | Empty app installs on Windows 10 and Ubuntu; backup and restore round-trip passes; power-cut test passes; cold start under 5 s; auth passes a security review | ~8 wks |
 | **1. Solo MVP (OPD + Pharmacy + Billing)** | M1–M7 | A pilot clinic runs **one full week of OPD** on one PC with no paper fallback | ~12 wks |
 | **2. IPD and compliance** | M8–M13 | A pilot hospital with 10–30 beds runs admissions to discharge, including an insurance case; statutory registers are reviewed by a compliance consultant | ~14 wks |
 | **3. LAN multi-device** | M14, thin clients, conflict review | Three or more devices for two weeks; a randomized sync test suite passes; no data loss after cutting Wi-Fi for a day | ~8 wks |
@@ -282,7 +288,8 @@ Multi-device sync ships in Phase 3, but the **data layer is sync-ready from Phas
 | ABDM needs a public endpoint | The cloud relay provides it; solo sites can still do M1 (ABHA verification) when online |
 | Drug master licensing | Ship a generic list; hospitals import their own brand list or supplier price lists |
 | Packaging Python for Windows (antivirus false positives on PyInstaller builds, slow start) | Code-sign the installer, use one-folder (not one-file) builds, measure start time in the Phase 0 spike. Fall back to Nuitka if needed |
-| SQLCipher with Django is not officially supported | Spike in Phase 0. Fallbacks: OS disk encryption (BitLocker) plus encrypted backups, or field-level encryption for the most sensitive tables |
+| `sqlcipher3` may lack ready-made Windows wheels | Spike in Phase 0: build the wheel in CI if needed. Fallbacks: OS disk encryption (BitLocker) plus encrypted backups, or field-level encryption for the most sensitive tables |
+| Home-built login, sessions, CSRF and permissions (FastAPI has none built in) | Use proven libraries (Starlette sessions, argon2-cffi), keep the code small and central, write tests for every permission, get a security review before the first pilot |
 | Python on Android | Tablets stay browser thin clients. A full offline Android node would be a separate app and is not planned |
 
 ---
@@ -292,10 +299,17 @@ Multi-device sync ships in Phase 3, but the **data layer is sync-ready from Phas
 ```
 vshms/
 ├── pyproject.toml          # Dependencies (managed with uv), ruff, mypy, pytest config
+├── alembic.ini
+├── migrations/             # Alembic migration scripts
 ├── src/vshms/
-│   ├── settings/           # Base, desktop, hub and relay settings
-│   ├── core/               # SyncModel base, HLC, UUIDv7, audit log, permissions, PIN login
+│   ├── main.py             # FastAPI app factory: routers, middleware, SQLAdmin mount
+│   ├── config.py           # Pydantic settings for desktop, hub and relay modes
+│   ├── db.py               # Engine (SQLite/SQLCipher or PostgreSQL), session, sync events
+│   ├── core/               # SyncBase mixin, HLC, UUIDv7, audit log, auth, permissions, PIN login
+│   ├── admin/              # SQLAdmin views for master data, using the app's login
 │   ├── sync/               # Outbox/inbox, push/pull API, merge rules, device pairing
+│   │                       # Each domain module below has models.py, schemas.py,
+│   │                       # services.py, routes.py and its own templates/
 │   ├── patients/           # Registration, UHID, consent
 │   ├── opd/                # Tokens, appointments, consultations
 │   ├── prescriptions/
@@ -305,9 +319,9 @@ vshms/
 │   ├── fhir/               # FHIR R4 / NRCeS mappings (ABDM, NHCX)
 │   ├── printing/           # Print templates (A4/A5), ESC/POS receipts, PDF
 │   ├── masters/            # Seed data: ICD-10, lab tests, generic drugs, PIN codes
-│   ├── templates/  static/ # Django templates, HTMX/Alpine, CSS
-│   └── locale/             # gettext translation files
-├── desktop/                # pywebview launcher (starts waitress, opens window)
+│   ├── templates/  static/ # Shared Jinja2 layouts and macros, HTMX/Alpine, CSS
+│   └── locale/             # Babel/gettext translation files
+├── desktop/                # pywebview launcher (starts Uvicorn, opens window)
 ├── packaging/              # PyInstaller spec, Inno Setup script, update signing
 ├── docs/                   # ADRs, compliance notes, user guides
 └── tests/
@@ -321,6 +335,6 @@ vshms/
 
 1. **Business model:** open source, freemium (Solo free, sync/cloud paid) or fully commercial? This affects licensing choices.
 2. **Pilot sites:** which hospitals, and which states (state Clinical Establishments rules and languages)?
-3. **UI approach:** server-rendered Django + HTMX (recommended: almost all Python, light on old PCs), or a separate JavaScript front end (React) talking to a Django REST API (richer offline browser behaviour, but a second language and build)?
+3. **UI approach:** server-rendered Jinja2 + HTMX (planned: almost all Python, light on old PCs), or a separate JavaScript front end (React) on the FastAPI JSON routes (richer offline browser behaviour, but a second language and build)? FastAPI keeps the second option open.
 4. **ABDM timing:** keep it in Phase 4, or move ABHA/Scan & Share into Phase 1 for the DHIS incentive?
 5. **Hosting the relay:** which Indian cloud region and provider for Tier 3 (relevant from Phase 4)?
