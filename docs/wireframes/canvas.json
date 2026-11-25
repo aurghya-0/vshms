@@ -1,0 +1,29 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-11-25T06:40:00Z" },
+  "title": "VSHMS Wireframes",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1366, "h": 768, "title": "Reception home", "expand": "fill" },
+    "Registration.dc.html": { "x": 1446, "y": 0, "w": 1366, "h": 900, "title": "Patient registration", "expand": "fill" },
+    "Consultation.dc.html": { "x": 2892, "y": 0, "w": 1366, "h": 880, "title": "Doctor consultation", "expand": "fill" },
+    "Billing.dc.html": { "x": 0, "y": 1020, "w": 1366, "h": 800, "title": "OPD billing", "expand": "fill" },
+    "Pharmacy.dc.html": { "x": 1446, "y": 1020, "w": 1366, "h": 800, "title": "Pharmacy dispensing", "expand": "fill" },
+    "BedBoard.dc.html": { "x": 2892, "y": 1020, "w": 1366, "h": 820, "title": "IPD bed board", "expand": "fill" },
+    "Login.dc.html": { "x": 0, "y": 1960, "w": 1366, "h": 768, "title": "Login and PIN switch", "expand": "fill" }
+  },
+  "order": [
+    "Main.dc.html",
+    "Registration.dc.html",
+    "Consultation.dc.html",
+    "Billing.dc.html",
+    "Pharmacy.dc.html",
+    "BedBoard.dc.html",
+    "Login.dc.html"
+  ],
+  "notes": {
+    "title": { "x": 0, "y": -300, "text": "VSHMS screen wireframes · desktop 1366 × 768 · low fidelity", "kind": "title1", "maxW": 4258 }
+  },
+  "designSystems": []
+}

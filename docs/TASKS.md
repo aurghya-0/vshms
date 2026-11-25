@@ -43,6 +43,8 @@ Changing a contract after its date needs a short note in the team channel and th
 
 ## Week 1: onboarding (all interns)
 
+The day-by-day schedule, workshops and exercises are in [docs/TRAINING.md](TRAINING.md). The summary below is what each intern must have done by Friday.
+
 Everyone:
 
 1. Reads PLAN.md (§1, §5 and §6 closely), README.md and CONTRIBUTING.md.

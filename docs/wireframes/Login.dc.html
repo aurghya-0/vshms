@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Login and PIN switch</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.muted{color:#5c5c58}
+.users{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.user{font:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border:1px solid #8a8a85;border-radius:6px;background:#fff;color:#1f1f1f;cursor:pointer;font-size:14px}
+.user.on{outline:3px solid #1f5fbf;outline-offset:1px}
+.avatar{width:44px;height:44px;border-radius:50%;background:#ebebe7;border:1px solid #8a8a85;display:flex;align-items:center;justify-content:center;font-weight:600}
+.pin{display:flex;gap:10px;justify-content:center}
+.pin input{width:52px;height:56px;text-align:center;font:inherit;font-size:24px;border:1px solid #8a8a85;border-radius:6px}
+</style>
+</helmet>
+<div style="min-height: 768px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px 16px; background: #f4f4f2">
+  <div style="text-align: center">
+    <div style="font-size: 14px" class="muted">VSHMS</div>
+    <h1 style="margin: 4px 0 0; font-size: 24px">[Hospital name]</h1>
+  </div>
+
+  <section class="box" style="width: 100%; max-width: 640px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+    <h2 style="margin: 0; font-size: 18px">Who is using this computer?</h2>
+    <div class="users">
+      <button class="user on"><span class="avatar" aria-hidden="true">PS</span>Priya S.<span class="muted" style="font-size: 12px">Reception</span></button>
+      <button class="user"><span class="avatar" aria-hidden="true">AR</span>Dr. A. Rao<span class="muted" style="font-size: 12px">Doctor</span></button>
+      <button class="user"><span class="avatar" aria-hidden="true">MT</span>Sr. Meena T.<span class="muted" style="font-size: 12px">Nurse</span></button>
+      <button class="user"><span class="avatar" aria-hidden="true">RK</span>Ravi K.<span class="muted" style="font-size: 12px">Pharmacy</span></button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center">
+      <span style="font-size: 14px">Enter Priya's 4-digit PIN</span>
+      <div class="pin">
+        <input aria-label="PIN digit 1" type="password" value="1">
+        <input aria-label="PIN digit 2" type="password" value="1">
+        <input aria-label="PIN digit 3" type="password">
+        <input aria-label="PIN digit 4" type="password">
+      </div>
+      <span class="muted" style="font-size: 12px">Locks after 5 wrong tries</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center">
+      <a href="#">Sign in with username and password</a>
+      <a href="Main.dc.html" class="btn primary" style="display: inline-flex; align-items: center; text-decoration: none">Continue</a>
+    </div>
+  </section>
+
+  <div class="muted" style="font-size: 13px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: center">
+    <span>Solo mode · offline</span>
+    <span>Last backup today 11:00</span>
+    <span>Language: English | हिंदी | বাংলা</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":768}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

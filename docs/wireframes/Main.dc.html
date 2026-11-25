@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reception home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #c9c9c5;background:#f4f4f2;font-size:14px}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.panel{background:#f4f4f2;border:1px solid #c9c9c5;border-radius:6px}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.btn.ghost{min-height:36px;padding:0 10px;border-color:transparent;background:transparent}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#5c5c58}
+.field input,.field select{font:inherit;font-size:15px;color:#1f1f1f;min-height:40px;padding:0 10px;border:1px solid #8a8a85;border-radius:6px;background:#fff}
+.kbd{font-family:ui-monospace,monospace;font-size:12px;border:1px solid #8a8a85;border-radius:4px;padding:1px 5px;color:#1f1f1f;background:#fff}
+.muted{color:#5c5c58}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #8a8a85;white-space:nowrap}
+.warn{color:#9a4a07;border-color:#b45309}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:600;color:#5c5c58;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:8px;border-bottom:1px solid #c9c9c5}
+td{padding:10px 8px;border-bottom:1px solid #e4e4e0}
+.shortcuts{display:flex;flex-wrap:wrap;gap:16px;padding:8px 20px;border-top:1px solid #c9c9c5;background:#f4f4f2;font-size:13px;color:#5c5c58}
+</style>
+</helmet>
+<div style="min-height: 768px; display: flex; flex-direction: column">
+  <header class="top">
+    <strong style="font-size: 16px">VSHMS</strong>
+    <span class="tag">Reception</span>
+    <nav style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="Main.dc.html" style="padding: 8px 10px; font-weight: 600">Home</a>
+      <a href="Registration.dc.html" style="padding: 8px 10px">Register</a>
+      <a href="Billing.dc.html" style="padding: 8px 10px">Billing</a>
+      <a href="BedBoard.dc.html" style="padding: 8px 10px">Beds</a>
+    </nav>
+    <span style="flex-grow: 1"></span>
+    <span class="muted">Solo · offline · last backup 2 h ago</span>
+    <button class="btn ghost" aria-label="Switch language">EN | हिं</button>
+    <span>Priya S.</span>
+    <a href="Login.dc.html" class="btn ghost" style="display: inline-flex; align-items: center; text-decoration: none; color: #1f1f1f">Lock <span class="kbd" style="margin-left: 6px">Ctrl+L</span></a>
+  </header>
+
+  <main style="flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+      <label class="field" style="flex: 999 1 420px">
+        Find a patient by mobile, name or UHID <span class="kbd" style="align-self: flex-start">F3</span>
+        <input type="search" value="98301" aria-label="Search patients">
+      </label>
+      <a href="Registration.dc.html" class="btn primary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none">New registration <span class="kbd">F2</span></a>
+      <button class="btn">OPD token</button>
+      <button class="btn">Admit</button>
+    </div>
+
+    <div class="box" style="padding: 8px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px">
+      <span class="muted" style="font-size: 12px">3 patients share mobile 98301 xxxxx</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <span><strong>Anil Das</strong> · M 52 · KM1-000812</span>
+        <span><strong>Rina Das</strong> · F 47 · KM1-000813</span>
+        <span><strong>Tuhin Das</strong> · M 9 · KM1-002140</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <section class="box" style="flex: 999 1 640px; min-width: 0; padding: 12px">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px">
+          <h2 style="margin: 0; font-size: 16px">Today's OPD queue</h2>
+          <span style="flex-grow: 1"></span>
+          <label class="field" style="flex-direction: row; align-items: center; gap: 8px">Doctor
+            <select><option>All doctors</option><option>Dr. A. Rao</option><option>Dr. S. Khan</option></select>
+          </label>
+        </div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead><tr><th>Token</th><th>Patient</th><th>Age/Sex</th><th>Doctor</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>A-07</td><td>Meera Ghosh</td><td>34 F</td><td>Dr. A. Rao</td><td><span class="tag">With doctor</span></td><td></td></tr>
+              <tr><td>A-08</td><td>Rafiq Ali</td><td>61 M</td><td>Dr. A. Rao</td><td><span class="tag">Waiting · 12 min</span></td><td><button class="btn ghost">Call</button></td></tr>
+              <tr><td>B-03</td><td>Sunita Paul</td><td>~45 F</td><td>Dr. S. Khan</td><td><span class="tag">Waiting · 5 min</span></td><td><button class="btn ghost">Call</button></td></tr>
+              <tr><td>A-06</td><td>Bikash Roy</td><td>28 M</td><td>Dr. A. Rao</td><td><span class="tag warn">To billing</span></td><td><a href="Billing.dc.html">Bill</a></td></tr>
+              <tr><td>B-02</td><td>Baby of Lata Sen</td><td>3 mo F</td><td>Dr. S. Khan</td><td><span class="tag">Done</span></td><td><button class="btn ghost">Reprint</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 12px">
+        <section class="panel" style="padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <div><div class="muted" style="font-size: 12px">OPD today</div><div style="font-size: 22px; font-weight: 700">[42]</div></div>
+          <div><div class="muted" style="font-size: 12px">Collected</div><div style="font-size: 22px; font-weight: 700">₹[1,02,450]</div></div>
+          <div><div class="muted" style="font-size: 12px">Beds occupied</div><div style="font-size: 22px; font-weight: 700">[14] / [20]</div></div>
+          <div><div class="muted" style="font-size: 12px">Pending bills</div><div style="font-size: 22px; font-weight: 700">[3]</div></div>
+        </section>
+        <section class="box" style="padding: 12px; font-size: 14px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 16px">Doctors in today</h2>
+          <div style="display: flex; justify-content: space-between"><span>Dr. A. Rao · Medicine</span><span class="muted">2 waiting</span></div>
+          <div style="display: flex; justify-content: space-between"><span>Dr. S. Khan · Paediatrics</span><span class="muted">1 waiting</span></div>
+          <div style="display: flex; justify-content: space-between"><span>Dr. P. Bose · Surgery</span><span class="muted">From 5 pm</span></div>
+        </section>
+        <section class="box warn" style="padding: 12px; font-size: 14px">
+          Back up to USB drive today <button class="btn" style="margin-top: 8px; width: 100%">Back up now</button>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="shortcuts">
+    <span><span class="kbd">F2</span> New patient</span>
+    <span><span class="kbd">F3</span> Search</span>
+    <span><span class="kbd">F5</span> Bill</span>
+    <span><span class="kbd">Ctrl+P</span> Print</span>
+    <span><span class="kbd">Esc</span> Back</span>
+    <span><span class="kbd">?</span> All shortcuts</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":768}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

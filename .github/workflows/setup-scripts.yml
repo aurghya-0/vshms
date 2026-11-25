@@ -1,0 +1,45 @@
+name: Setup scripts
+
+# Proves that the one-command setup scripts in scripts/ work from a clean machine,
+# including installing uv, on every OS the interns use. Runs only when they could break.
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - "scripts/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/setup-scripts.yml"
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/setup-scripts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  unix:
+    name: setup.sh (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the setup script from scratch (installs uv, Python and packages)
+        run: ./scripts/setup.sh --yes
+
+  windows:
+    name: setup.ps1 (Windows PowerShell 5.1)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the setup script from scratch (installs uv, Python and packages)
+        shell: powershell
+        run: ./scripts/setup.ps1 -Yes

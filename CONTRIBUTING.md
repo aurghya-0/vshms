@@ -2,8 +2,8 @@
 
 ## Setup
 
-1. Install Python 3.12+ and [uv](https://docs.astral.sh/uv/).
-2. Clone the repository and run `uv sync`.
+1. Clone the repository and run the setup script (`./scripts/setup.sh` or, on Windows, `powershell -ExecutionPolicy Bypass -File scripts\setup.ps1`). It installs uv, Python and every package. See [docs/SETUP.md](docs/SETUP.md).
+2. If you set things up by hand instead: install Python 3.12+ and [uv](https://docs.astral.sh/uv/), then run `uv sync`.
 3. Run the checks: `uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov`.
 4. Read [CLAUDE.md](CLAUDE.md): the standing rules, including **how to write unit and integration tests**, apply to every change.
 

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IPD bed board</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #c9c9c5;background:#f4f4f2;font-size:14px}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.panel{background:#f4f4f2;border:1px solid #c9c9c5;border-radius:6px}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.btn.ghost{min-height:36px;padding:0 10px;border-color:transparent;background:transparent}
+.kbd{font-family:ui-monospace,monospace;font-size:12px;border:1px solid #8a8a85;border-radius:4px;padding:1px 5px;color:#1f1f1f;background:#fff}
+.muted{color:#5c5c58}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #8a8a85;white-space:nowrap}
+.warn{color:#9a4a07;border-color:#b45309}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #c9c9c5}
+.tabs button{font:inherit;font-size:14px;min-height:44px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:none;color:#5c5c58;cursor:pointer}
+.tabs button.on{color:#1f1f1f;font-weight:600;border-bottom-color:#1f5fbf}
+.beds{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.bed{font:inherit;text-align:left;display:flex;flex-direction:column;gap:4px;padding:12px;min-height:112px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;font-size:13px;cursor:pointer}
+.bed strong{font-size:15px}
+.bed.vacant{border-style:dashed;background:#f4f4f2}
+.bed.clean{border-style:dotted;background:#f4f4f2}
+.bed.sel{outline:3px solid #1f5fbf;outline-offset:1px}
+.bed.conflict{border:2px solid #b45309}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:#5c5c58;align-items:center}
+.sw{display:inline-block;width:18px;height:14px;border-radius:3px;border:1px solid #8a8a85;vertical-align:middle;margin-right:6px;background:#fff}
+.shortcuts{display:flex;flex-wrap:wrap;gap:16px;padding:8px 20px;border-top:1px solid #c9c9c5;background:#f4f4f2;font-size:13px;color:#5c5c58}
+</style>
+</helmet>
+<div style="min-height: 820px; display: flex; flex-direction: column">
+  <header class="top">
+    <strong style="font-size: 16px">VSHMS</strong>
+    <span class="tag">Nursing station</span>
+    <nav style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="BedBoard.dc.html" style="padding: 8px 10px; font-weight: 600">Bed board</a>
+      <a href="#" style="padding: 8px 10px">Medicines due</a>
+      <a href="#" style="padding: 8px 10px">Handover</a>
+    </nav>
+    <span style="flex-grow: 1"></span>
+    <span class="tag warn">1 sync conflict</span>
+    <span class="muted">Hub · online</span>
+    <span>Sr. Meena T.</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+        <h1 style="margin: 0; font-size: 22px">Beds</h1>
+        <span class="muted" style="font-size: 14px">[14] occupied · [4] vacant · [1] cleaning · [1] reserved</span>
+        <span style="flex-grow: 1"></span>
+        <button class="btn primary">Admit patient <span class="kbd" style="margin-left: 6px">F6</span></button>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="on" role="tab">General ward (10)</button>
+        <button role="tab">Female ward (6)</button>
+        <button role="tab">ICU (2)</button>
+        <button role="tab">Private rooms (2)</button>
+      </div>
+
+      <div class="beds">
+        <button class="bed"><strong>G-01</strong><span>Nikhil Pal · 45 M</span><span class="muted">Day 3 · Dr. P. Bose</span></button>
+        <button class="bed"><strong>G-02</strong><span>Abdul Karim · 70 M</span><span class="muted">Day 6 · Dr. A. Rao</span><span class="tag warn" style="align-self: flex-start">Deposit low</span></button>
+        <button class="bed vacant"><strong>G-03</strong><span>Vacant</span></button>
+        <button class="bed sel"><strong>G-04</strong><span>Rafiq Ali · 61 M</span><span class="muted">Day 2 · Dr. A. Rao</span><span class="tag" style="align-self: flex-start">Medicines due 2 pm</span></button>
+        <button class="bed clean"><strong>G-05</strong><span>Cleaning</span><span class="muted">Discharged 11:40</span></button>
+        <button class="bed"><strong>G-06</strong><span>Tapas Dey · 39 M</span><span class="muted">Day 1 · Dr. P. Bose</span><span class="tag" style="align-self: flex-start">Post-op</span></button>
+        <button class="bed conflict"><strong>G-07</strong><span>2 patients allotted</span><span style="color: #9a4a07">Allotted on 2 devices while offline: resolve</span></button>
+        <button class="bed vacant"><strong>G-08</strong><span>Reserved</span><span class="muted">For OT patient, 5 pm</span></button>
+        <button class="bed"><strong>G-09</strong><span>Sanjay Ghosh · 52 M</span><span class="muted">Day 4 · Dr. A. Rao</span></button>
+        <button class="bed vacant"><strong>G-10</strong><span>Vacant</span></button>
+      </div>
+
+      <div class="legend">
+        <span><span class="sw"></span>Occupied (solid)</span>
+        <span><span class="sw" style="border-style: dashed; background: #f4f4f2"></span>Vacant / reserved (dashed)</span>
+        <span><span class="sw" style="border-style: dotted; background: #f4f4f2"></span>Cleaning (dotted)</span>
+        <span><span class="sw" style="border: 2px solid #b45309"></span>Needs attention</span>
+      </div>
+    </div>
+
+    <aside style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 12px">
+      <section class="box" style="padding: 16px; display: flex; flex-direction: column; gap: 4px">
+        <strong style="font-size: 18px">G-04 · Rafiq Ali</strong>
+        <span class="muted" style="font-size: 14px">61 M · IP-26-0318 · Dr. A. Rao</span>
+        <span class="muted" style="font-size: 14px">Admitted 23-11-2026 · Pneumonia</span>
+        <hr style="border: 0; border-top: 1px solid #e4e4e0; margin: 8px 0; width: 100%">
+        <div class="row"><span>Running bill</span><span>₹[18,640]</span></div>
+        <div class="row"><span>Deposit paid</span><span>₹[20,000]</span></div>
+        <div class="row" style="font-weight: 700"><span>Balance</span><span>₹[1,360]</span></div>
+        <div class="row"><span>Payer</span><span>Self pay</span></div>
+      </section>
+      <section class="panel" style="padding: 12px; font-size: 14px">
+        <strong>Last vitals · 10:00</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px">
+          <span>BP 132/86</span><span>Pulse 88</span><span>Temp 99.1 °F</span><span>SpO₂ 95%</span>
+        </div>
+      </section>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button class="btn">Record vitals</button>
+        <button class="btn">Give medicines</button>
+        <button class="btn">Add charge</button>
+        <button class="btn">Collect deposit</button>
+        <button class="btn">Transfer bed</button>
+        <button class="btn">Start discharge</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="shortcuts">
+    <span><span class="kbd">F6</span> Admit</span>
+    <span><span class="kbd">V</span> Vitals for selected bed</span>
+    <span><span class="kbd">Arrow keys</span> Move between beds</span>
+    <span>Works on a tablet at the nursing station</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OPD billing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#1f1f1f;background:#fff}
+a{color:#1f5fbf}a:hover{color:#174a94}
+*{box-sizing:border-box}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #c9c9c5;background:#f4f4f2;font-size:14px}
+.box{border:1px solid #c9c9c5;border-radius:6px;background:#fff}
+.panel{background:#f4f4f2;border:1px solid #c9c9c5;border-radius:6px}
+.btn{font:inherit;font-size:14px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid #8a8a85;background:#fff;color:#1f1f1f;cursor:pointer}
+.btn.primary{background:#1f5fbf;border-color:#1f5fbf;color:#fff}
+.btn.ghost{min-height:36px;padding:0 10px;border-color:transparent;background:transparent}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#5c5c58}
+.field input,.field select{font:inherit;font-size:15px;color:#1f1f1f;min-height:40px;padding:0 10px;border:1px solid #8a8a85;border-radius:6px;background:#fff}
+.kbd{font-family:ui-monospace,monospace;font-size:12px;border:1px solid #8a8a85;border-radius:4px;padding:1px 5px;color:#1f1f1f;background:#fff}
+.muted{color:#5c5c58}
+.tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #8a8a85;white-space:nowrap}
+.warn{color:#9a4a07;border-color:#b45309}
+.ph{background:repeating-linear-gradient(45deg,#f4f4f2 0 8px,#ebebe7 8px 16px);border:1px dashed #8a8a85;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5c5c58;font-size:13px;text-align:center}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:600;color:#5c5c58;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:8px;border-bottom:1px solid #c9c9c5}
+td{padding:10px 8px;border-bottom:1px solid #e4e4e0}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.seg{display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:#1f1f1f}
+.seg label{display:flex;align-items:center;gap:6px;border:1px solid #8a8a85;border-radius:6px;padding:0 12px;min-height:44px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:4px 0}
+.shortcuts{display:flex;flex-wrap:wrap;gap:16px;padding:8px 20px;border-top:1px solid #c9c9c5;background:#f4f4f2;font-size:13px;color:#5c5c58}
+</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-direction: column">
+  <header class="top">
+    <strong style="font-size: 16px">VSHMS</strong>
+    <span class="tag">Billing</span>
+    <nav style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a href="Main.dc.html" style="padding: 8px 10px">Home</a>
+      <a href="Billing.dc.html" style="padding: 8px 10px; font-weight: 600">Billing</a>
+      <a href="#" style="padding: 8px 10px">Day-end closing</a>
+    </nav>
+    <span style="flex-grow: 1"></span>
+    <span class="muted">Solo · offline</span>
+    <span>Priya S.</span>
+  </header>
+
+  <main style="flex-grow: 1; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <section class="panel" style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center">
+        <div><strong style="font-size: 18px">Bikash Roy</strong> <span class="muted">· 28 M · KM1-004102</span></div>
+        <span style="flex-grow: 1"></span>
+        <label class="field" style="flex-direction: row; align-items: center; gap: 8px">Payer
+          <select><option>Self pay</option><option>TPA / insurance</option><option>PM-JAY</option><option>CGHS</option></select>
+        </label>
+        <label class="field" style="flex-direction: row; align-items: center; gap: 8px">Tariff
+          <select><option>General</option><option>Staff</option></select>
+        </label>
+      </section>
+
+      <section class="box" style="padding: 12px">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 8px">
+          <label class="field" style="flex: 1 1 320px">Add service or test <span class="kbd" style="align-self: flex-start">F4</span>
+            <input type="search" placeholder="Consultation, CBC, dressing…">
+          </label>
+        </div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead><tr><th>Service</th><th>Doctor / dept</th><th class="num">Qty</th><th class="num">Rate ₹</th><th class="num">Amount ₹</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>OPD consultation</td><td>Dr. A. Rao</td><td class="num">1</td><td class="num">[500.00]</td><td class="num">[500.00]</td><td><button class="btn ghost" aria-label="Remove line">Remove</button></td></tr>
+              <tr><td>CBC</td><td>Laboratory</td><td class="num">1</td><td class="num">[300.00]</td><td class="num">[300.00]</td><td><button class="btn ghost" aria-label="Remove line">Remove</button></td></tr>
+              <tr><td>Dressing, small</td><td>OPD procedure</td><td class="num">1</td><td class="num">[150.00]</td><td class="num">[150.00]</td><td><button class="btn ghost" aria-label="Remove line">Remove</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="box" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px">Payment</h2>
+        <div class="seg" role="radiogroup" aria-label="Payment mode">
+          <label><input type="radio" name="pay"> Cash</label>
+          <label><input type="radio" name="pay" checked> UPI</label>
+          <label><input type="radio" name="pay"> Card</label>
+          <label><input type="radio" name="pay"> Split</label>
+          <label><input type="radio" name="pay"> From deposit</label>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center">
+          <div class="ph" style="width: 160px; height: 160px">UPI QR<br>for ₹950<br>(made offline)</div>
+          <div style="display: flex; flex-direction: column; gap: 12px; flex: 1 1 240px">
+            <label class="field">UPI reference (optional)<input placeholder="12-digit UTR"></label>
+            <label style="display: flex; gap: 8px; align-items: center; font-size: 14px"><input type="checkbox" checked> Payment seen on hospital phone</label>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 12px">
+      <section class="box" style="padding: 16px">
+        <div class="row"><span class="muted">Invoice no.</span><span>R1/26-27/00124</span></div>
+        <div class="row"><span class="muted">Date</span><span>25-11-2026</span></div>
+        <hr style="border: 0; border-top: 1px solid #e4e4e0; margin: 8px 0">
+        <div class="row"><span>Subtotal</span><span class="num">₹[950.00]</span></div>
+        <div class="row"><span>Discount <button class="btn ghost" style="min-height: 28px; font-size: 13px">Add (needs approval)</button></span><span class="num">₹0.00</span></div>
+        <div class="row"><span>GST</span><span class="muted">Exempt: healthcare service</span></div>
+        <hr style="border: 0; border-top: 1px solid #e4e4e0; margin: 8px 0">
+        <div class="row" style="font-size: 20px; font-weight: 700"><span>Total</span><span class="num">₹[950.00]</span></div>
+      </section>
+      <button class="btn primary">Save and print receipt <span class="kbd" style="margin-left: 6px">F5</span></button>
+      <button class="btn">Print A4 bill</button>
+      <button class="btn ghost">Hold bill</button>
+      <div class="ph" style="height: 200px">80 mm thermal receipt preview</div>
+      <p class="muted" style="font-size: 12px; margin: 0">Saved bills can't be edited. Mistakes are fixed with Void and re-issue, with a reason.</p>
+    </aside>
+  </main>
+
+  <footer class="shortcuts">
+    <span><span class="kbd">F4</span> Add service</span>
+    <span><span class="kbd">F5</span> Save and print</span>
+    <span><span class="kbd">Ctrl+D</span> Discount</span>
+    <span><span class="kbd">Esc</span> Back</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1366,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
