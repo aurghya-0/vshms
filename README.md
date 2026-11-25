@@ -6,6 +6,7 @@ It runs on a single PC with no internet and can optionally sync across devices o
 - **Product and architecture plan:** [PLAN.md](PLAN.md)
 - **Intern tasks and schedule:** [docs/TASKS.md](docs/TASKS.md)
 - **How we work (setup, branches, reviews, code conventions):** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Intern training plan (first week and ramp-up):** [docs/TRAINING.md](docs/TRAINING.md)
 - **Standing rules, including testing rules:** [CLAUDE.md](CLAUDE.md)
 
 ## Quick start
