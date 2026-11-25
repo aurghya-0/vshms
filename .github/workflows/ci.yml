@@ -1,16 +1,24 @@
 name: CI
 
+# Lint, type check and tests. Runs on pushes to feature branches for fast feedback,
+# and is called by main-gate.yml for every pull request to main and every push to main.
 on:
   push:
-  pull_request:
+    branches-ignore: [main]
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   test:
+    name: Test (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -18,13 +26,13 @@ jobs:
           python-version: "3.12"
       - name: Install uv
         run: pip install uv
-      - name: Install dependencies
-        run: uv sync
-      - name: Lint
+      - name: Install dependencies (lockfile must be up to date)
+        run: uv sync --locked
+      - name: Lint (including security rules)
         run: uv run ruff check .
       - name: Format check
         run: uv run ruff format --check .
       - name: Type check
         run: uv run mypy
-      - name: Tests
-        run: uv run pytest
+      - name: Tests with coverage
+        run: uv run pytest --cov

@@ -1,5 +1,8 @@
 """Database engine, session factory and the declarative base for all models.
 
+The engine and session factory belong to the app (``app.state``), not to module
+globals, so every test can run against its own throwaway database.
+
 Sync-related session events (outbox capture, HLC stamping, rejecting bulk
 updates on syncable tables) are added here by task A3 in docs/TASKS.md.
 SQLCipher encryption is added by task C2.
@@ -8,10 +11,11 @@ SQLCipher encryption is added by task C2.
 from collections.abc import Iterator
 from typing import Any
 
+from fastapi import Request
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from vshms.config import Settings, get_settings
+from vshms.config import Settings
 
 
 class Base(DeclarativeBase):
@@ -37,21 +41,12 @@ def make_engine(settings: Settings) -> Engine:
     return create_engine(url, pool_pre_ping=True)
 
 
-_engine: Engine | None = None
-_session_factory: sessionmaker[Session] | None = None
+def make_session_factory(engine: Engine) -> sessionmaker[Session]:
+    return sessionmaker(bind=engine, expire_on_commit=False)
 
 
-def get_engine() -> Engine:
-    global _engine, _session_factory
-    if _engine is None:
-        _engine = make_engine(get_settings())
-        _session_factory = sessionmaker(bind=_engine, expire_on_commit=False)
-    return _engine
-
-
-def get_session() -> Iterator[Session]:
-    """FastAPI dependency: one session per request, committed by the caller."""
-    get_engine()
-    assert _session_factory is not None
-    with _session_factory() as session:
+def get_session(request: Request) -> Iterator[Session]:
+    """FastAPI dependency: one session per request. Services commit explicitly."""
+    factory: sessionmaker[Session] = request.app.state.session_factory
+    with factory() as session:
         yield session

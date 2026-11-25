@@ -4,7 +4,8 @@
 
 1. Install Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 2. Clone the repository and run `uv sync`.
-3. Run the checks: `uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest`.
+3. Run the checks: `uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov`.
+4. Read [CLAUDE.md](CLAUDE.md): the standing rules, including **how to write unit and integration tests**, apply to every change.
 
 ## Workflow
 
@@ -12,7 +13,7 @@
 - Open a **draft pull request early**, by day 2 of a task, so reviewers can catch problems before they grow.
 - Every pull request needs **one review from the mentor**, plus one from another intern when the change touches that intern's area (see the ownership table in [docs/TASKS.md](docs/TASKS.md)).
 - Keep pull requests small: under about 400 changed lines where possible. Split large tasks into several pull requests.
-- CI must be green before merging. Never skip or delete a failing test to get green; ask for help instead.
+- CI must be green before merging. Pull requests to `main` also run the **Main gate**: security scans (CodeQL, Bandit, vulnerable dependencies, leaked secrets) and a migration check. Never skip or delete a failing test or silence a security finding to get green; ask for help instead.
 - Squash-merge. The pull request title becomes the commit message, so start it with the task ID: `A2: Add hybrid logical clock`.
 
 ## Module layout

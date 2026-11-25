@@ -6,6 +6,7 @@ It runs on a single PC with no internet and can optionally sync across devices o
 - **Product and architecture plan:** [PLAN.md](PLAN.md)
 - **Intern tasks and schedule:** [docs/TASKS.md](docs/TASKS.md)
 - **How we work (setup, branches, reviews, code conventions):** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Standing rules, including testing rules:** [CLAUDE.md](CLAUDE.md)
 
 ## Quick start
 
@@ -24,7 +25,7 @@ Open http://127.0.0.1:8710/. The health check is at `/health`.
 ## Checks (all must pass before a pull request is merged)
 
 ```bash
-uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest
+uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov
 ```
 
 ## Layout
@@ -44,6 +45,6 @@ src/vshms/
 desktop/                      pywebview desktop launcher
 packaging/                    PyInstaller and Inno Setup installer
 migrations/                   Alembic migrations
-tests/unit/  tests/sync_sim/  Unit tests and the sync simulation suite
+tests/unit/ tests/integration/ tests/sync_sim/   Unit, integration and sync simulation tests
 docs/adr/                     Architecture decision records
 ```

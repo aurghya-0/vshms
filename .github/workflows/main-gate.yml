@@ -1,0 +1,130 @@
+name: Main gate
+
+# Everything that must pass before code reaches main: tests, migrations, and security
+# scans (code vulnerabilities, vulnerable dependencies, leaked secrets).
+#
+# In GitHub: Settings → Branches → add a protection rule (or ruleset) for main that
+# requires the "Main gate passed" status check, so nothing merges unless it is green.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  merge_group:
+  schedule:
+    - cron: "17 3 * * 1" # Mondays 03:17 UTC: re-scan for newly published vulnerabilities
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    uses: ./.github/workflows/ci.yml
+
+  migrations:
+    name: Migrations match models
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VSHMS_DATA_DIR: .ci-data # throwaway database for this check only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install uv
+      - run: uv sync --locked
+      - name: Apply all migrations to an empty database
+        run: uv run alembic upgrade head
+      - name: Fail if models changed without a migration
+        run: uv run alembic check
+
+  codeql:
+    name: CodeQL code scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: python, actions
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v4
+
+  bandit:
+    name: Bandit security lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install bandit
+      - name: Scan application code (medium severity and above fails)
+        run: bandit -r src desktop -ll
+
+  dependency-audit:
+    name: Vulnerable dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install uv pip-audit
+      - name: Export the locked dependency set
+        run: uv export --locked --no-emit-project --format requirements-txt -o "$RUNNER_TEMP/requirements.txt" > /dev/null
+      - name: Audit against the PyPI and OSV advisory databases
+        run: pip-audit --disable-pip --strict -r "$RUNNER_TEMP/requirements.txt"
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: on-failure
+
+  secrets:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  gate:
+    name: Main gate passed
+    if: always()
+    needs: [tests, migrations, codeql, bandit, dependency-audit, dependency-review, secrets]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail unless every check passed (dependency review is skipped outside pull requests)
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success" or .result == "skipped")' > /dev/null
