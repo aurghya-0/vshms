@@ -11,7 +11,7 @@ How we bring three new interns up to speed before they own tracks A, B and C in 
 ### Mentor checklist (do this the week before)
 
 - [ ] The three interns have GitHub accounts and are added to the repository with write access to feature branches. Branch protection on `main` requires the **Main gate passed** check ([README](../README.md)).
-- [ ] Each intern has a working laptop with Python 3.12+, [uv](https://docs.astral.sh/uv/), Git and a code editor. Track C also needs a **Windows 10/11 machine or VM** for installer and printing work.
+- [ ] Each intern has a working laptop with Git and a code editor (the setup script installs the rest). Track C also needs a **Windows 10/11 machine or VM** for installer and printing work.
 - [ ] A team channel exists, with the stand-up time and the Friday demo time fixed in everyone's calendar.
 - [ ] A short **hospital visit** is booked for day 4 (a small clinic or nursing home that agrees to being observed; no patient data is collected). See [Day 4](#day-4-domain-and-security).
 - [ ] Starter tasks S1, S2 and S3 are created as GitHub issues, each with its "done when" from TASKS.md.
@@ -21,7 +21,7 @@ How we bring three new interns up to speed before they own tracks A, B and C in 
 ### Interns' pre-work (about 3 hours, sent a week ahead)
 
 1. Read [README.md](../README.md) and [PLAN.md](../PLAN.md) sections 1, 2 and 6 (principles, users, usability).
-2. Install the tools and run `uv sync` in a fresh clone. Send the mentor a screenshot of `uv run pytest` passing. If it fails, fix it together on day 1, not in front of the group.
+2. Follow [docs/SETUP.md](SETUP.md) in a fresh clone (install Git, run the setup script). Send the mentor a screenshot of `uv run pytest` passing. If it fails, fix it together on day 1, not in front of the group.
 3. Write 5 lines about the last time you used a hospital or pharmacy: what was slow or confusing? We use these on day 4.
 
 ## Part 2: Week 1 schedule
@@ -34,7 +34,7 @@ Each day is about 6 working hours: workshops in the morning, hands-on work in th
 |---|---|---|
 | 1 h | **Welcome.** Team, rhythm (stand-up, Monday planning, Wednesday pairing, Friday demo), how to ask for help (stuck 2 hours: ask; stuck a day: raise at stand-up) | Everyone knows who to ask |
 | 1.5 h | **What we are building and for whom.** Walk through [PLAN.md](../PLAN.md): offline first, one device or many, who uses it, why small hospitals. Look at the [wireframes](wireframes/README.md) | Each intern explains the three deployment tiers in their own words |
-| 1.5 h | **Setup clinic.** Clone, `uv sync`, run the app, run all checks. Fix anything that fails, pair-by-pair | `uv run pytest --cov` green on every laptop |
+| 1.5 h | **Setup clinic.** Follow [docs/SETUP.md](SETUP.md): clone, run the setup script, start the app, run all checks. Fix anything that fails, pair-by-pair | `uv run pytest --cov` green on every laptop |
 | 2 h | **Codebase tour.** Walk the repo: `main.py`, `config.py`, `db.py`, the module layout, `tests/conftest.py`. Trace one request, `GET /health`, from route to response | Each intern draws the request path on paper |
 | 0.5 h | Wrap-up: what is still unclear? | Questions list for tomorrow |
 
